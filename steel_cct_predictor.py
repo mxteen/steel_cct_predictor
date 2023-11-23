@@ -75,7 +75,7 @@ def Bs_Calc(comp):
     return int(637-(58*comp['C'])-(35*comp['Mn'])-(15*comp['Ni'])-(34*comp['Cr'])-(41*comp['Mo']))
 
 def Ms_Calc(comp):
-    return int(539-(423*comp['C'])-(30.4*comp['Mn'])-(17.7*comp['Ni'])-(12.1*comp['Cr'])-(7.5*comp['Mo'])-(7.5*comp['Si'])+(10*comp['Co']))
+    return int(561-(474*comp['C'])-(33*comp['Mn'])-(17*comp['Ni'])-(17*comp['Cr'])-(21*comp['Mo'])-(7.5*comp['Si'])+(10*comp['Co']))
 
 def FC_Calc(comp):
     return np.exp(1+(6.31*comp['C'])+(1.78*comp['Mn'])+(0.31*comp['Si'])+(1.12*comp['Ni'])+(2.7*comp['Cr'])+(4.06*comp['Mo']))
