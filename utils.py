@@ -27,3 +27,42 @@ def mass2mole(mass):
 
 def roundup(x):
     return x if x % 1000 == 0 else x + 1000 - x % 1000
+
+
+def fill_missing_elements(
+        composition: dict[str, float], inplace: bool = True) -> dict[str, float] | None:
+    """
+    Fills missing elements in a chemical composition dictionary with zeros.
+
+    Parameters:
+    composition (dict[str, float]): A dictionary representing the chemical
+                                    composition, where keys are element symbols
+                                    and values are their respective amounts.
+    inplace (bool): If True, modifies the input dictionary in place. If False,
+                    returns a new dictionary with the missing values filled.
+                    Default is True.
+
+    Returns:
+    dict[str, float] | None: If inplace is False, returns a new dictionary with
+                             the missing values filled. If inplace is True,
+                             returns None.
+    """
+    # List of standard elements to check for in the composition
+    elements = ['C', 'Si', 'Mn', 'P', 'Cr', 'Ni', 'Cu',
+                'Mo', 'Al', 'V', 'Ti', 'Co', 'W', 'As']
+
+    if inplace:
+        # Fill missing elements with zero in the original composition dictionary
+        for e in elements:
+            composition.setdefault(e, 0)
+        # Return None as the operation is done in place
+        return None
+    else:
+        # Create a copy of the original composition dictionary
+        composition_filled = composition.copy()
+        # Fill missing elements with zero in the new composition dictionary
+        for e in elements:
+            if e not in composition_filled:
+                composition_filled[e] = 0
+        # Return the new dictionary with missing values filled
+        return composition_filled

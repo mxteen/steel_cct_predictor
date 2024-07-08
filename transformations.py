@@ -7,27 +7,15 @@ from utils import mass2mole
 
 # define sub-functions to be used in primary functions
 def Ae3_Calc(comp):
-    required_elm = ['C','Si','Mn','Ni','Cr']
-    for e in required_elm:
-        if e not in comp:
-            comp[e] = 0
     return int(((1570-(323*comp['C'])-(25*comp['Mn'])+(80*comp['Si'])-(3*comp['Cr'])-(32*comp['Ni']))-32)*(5/9))
 
 def Ae1_Calc(comp):
-    required_elm = ['Si','Mn','Ni','Cr']
-    for e in required_elm:
-        if e not in comp:
-            comp[e] = 0
     return int(((1333-(25*comp['Mn'])+(40*comp['Si'])+(42*comp['Cr'])-(26*comp['Ni']))-32)*(5/9))
 
 def Acm_Calc(comp):
     return int(224.4 + (992.4*comp['C']) - (465.1*(comp['C']**2)) + (46.7*comp['Cr']) + (19*comp['C']*comp['Cr']) - (6.1*(comp['Cr']**2)) + (7.6*comp['Mn']) + (10*comp['Mo']) - (6.8*comp['Cr']*comp['Mo']) - (6.9*comp['Ni']) + (3.7*comp['C']*comp['Ni']) - (2.7*comp['Cr']*comp['Ni']) + (0.8*(comp['Ni']**2)) + (16.7*comp['Si']))
 
 def Ae3C_Calc(comp,T):
-    required_elm = ['Si','Mn','Ni','Cr']
-    for e in required_elm:
-        if e not in comp:
-            comp[e] = 0
     return (((T*(9/5))+32)-1570+(25*comp['Mn'])-(80*comp['Si'])+(3*comp['Cr'])+(32*comp['Ni']))/(-323)
 
 def densityf(T,comp,sf):
@@ -115,14 +103,6 @@ def CCT_Fractions(Ts,rates):
     return df
 
 def Steel_CCT_Calculator(comp,G,rates):
-
-    elements = ['C', 'Si', 'Mn', 'Ni', 'Cr', 'Mo', 'V', 'Cu', 'Al', 'Ti', 'Co', 'W', 'P', 'As']
-    for e in elements:
-        if e in comp.keys():
-            pass
-        else:
-            comp[e] = 0
-
     SX = {}
     for X in np.linspace(0.01,0.99,99):
         SX[round(X,2)] = quad(SX_eq, 0, round(X,2))[0]
