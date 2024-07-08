@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 import numpy as np
 from utils import roundup
-from transformations import Ae3_Calc, Ae1_Calc
+from transformations import ae3_calc, ae1_calc
 # import seaborn as sns
 
 # sns.set(style="ticks", palette="pastel")
@@ -13,9 +13,9 @@ def CCT_Plotter(Ts, comp, rates):
 
     plt.figure(figsize=(12,8))
 
-    Ae3i, Ae1i = Ae3_Calc(comp), Ae1_Calc(comp)
+    Ae3i, Ae1i = ae3_calc(comp), ae1_calc(comp)
 
-    maxX = roundup(Ae3_Calc(comp)/min(rates))
+    maxX = roundup(ae3_calc(comp)/min(rates))
 
     plt.plot([0.1,maxX],[Ae3i,Ae3i], color = 'k', linestyle = '--', linewidth = 1.5)
     plt.text(maxX*0.1, Ae3i-10, '$Ae_3$='+str(Ae3i)+'\N{DEGREE SIGN}C', bbox={'facecolor': 'white'},fontsize=14)

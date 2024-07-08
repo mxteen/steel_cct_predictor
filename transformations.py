@@ -6,16 +6,100 @@ import pandas as pd
 from utils import mass2mole
 
 # define sub-functions to be used in primary functions
-def Ae3_Calc(comp):
-    return int(((1570-(323*comp['C'])-(25*comp['Mn'])+(80*comp['Si'])-(3*comp['Cr'])-(32*comp['Ni']))-32)*(5/9))
+def ae3_calc(composition: dict[str, float]) -> int:
+    """
+    Calculates the Ae3 temperature based on the chemical composition of a steel alloy.
 
-def Ae1_Calc(comp):
-    return int(((1333-(25*comp['Mn'])+(40*comp['Si'])+(42*comp['Cr'])-(26*comp['Ni']))-32)*(5/9))
+    Parameters:
+    composition (dict[str, float]): A dictionary representing the chemical
+                                    composition, where keys are element symbols
+                                    and values are their respective amounts.
 
-def Acm_Calc(comp):
-    return int(224.4 + (992.4*comp['C']) - (465.1*(comp['C']**2)) + (46.7*comp['Cr']) + (19*comp['C']*comp['Cr']) - (6.1*(comp['Cr']**2)) + (7.6*comp['Mn']) + (10*comp['Mo']) - (6.8*comp['Cr']*comp['Mo']) - (6.9*comp['Ni']) + (3.7*comp['C']*comp['Ni']) - (2.7*comp['Cr']*comp['Ni']) + (0.8*(comp['Ni']**2)) + (16.7*comp['Si']))
+    Returns:
+    int: The calculated Ae3 temperature in degrees Celsius.
 
-def Ae3C_Calc(comp,T):
+    """
+    # Intermediate variables for readability
+    c = composition.get('C', 0)
+    mn = composition.get('Mn', 0)
+    si = composition.get('Si', 0)
+    cr = composition.get('Cr', 0)
+    ni = composition.get('Ni', 0)
+
+    # Ae3 temperature calculation
+    temp_fahrenheit = 1570 - (323 * c) - (25 * mn) + (80 * si) - (3 * cr) - (32 * ni)
+    temp_celsius = int((temp_fahrenheit - 32) * (5 / 9))
+
+    return temp_celsius
+
+
+def ae1_calc(composition: dict[str, float]) -> int:
+    """
+    Calculates the Ae1 temperature based on the chemical composition of a steel alloy.
+
+    Parameters:
+    composition (dict[str, float]): A dictionary representing the chemical
+                                    composition, where keys are element symbols
+                                    and values are their respective amounts.
+
+    Returns:
+    int: The calculated Ae1 temperature in degrees Celsius.
+    """
+    # Intermediate variables for readability
+    mn = composition.get('Mn', 0)
+    si = composition.get('Si', 0)
+    cr = composition.get('Cr', 0)
+    ni = composition.get('Ni', 0)
+
+    # Ae1 temperature calculation
+    temp_fahrenheit = 1333 - (25 * mn) + (40 * si) + (42 * cr) - (26 * ni)
+    temp_celsius = int((temp_fahrenheit - 32) * (5 / 9))
+
+    return temp_celsius
+
+
+def acm_calc(composition: dict[str, float]) -> int:
+    """
+    Calculates the Acm temperature based on the chemical composition of a steel alloy.
+
+    Parameters:
+    composition (dict[str, float]): A dictionary representing the chemical
+                                    composition, where keys are element symbols
+                                    and values are their respective amounts.
+
+    Returns:
+    int: The calculated Acm temperature.
+    """
+    # Intermediate variables for readability
+    c = composition.get('C', 0)
+    cr = composition.get('Cr', 0)
+    mn = composition.get('Mn', 0)
+    mo = composition.get('Mo', 0)
+    ni = composition.get('Ni', 0)
+    si = composition.get('Si', 0)
+
+    # ACM value calculation
+    acm_value = (
+        224.4 +
+        992.4 * c -
+        465.1 * (c ** 2) +
+        46.7 * cr +
+        19 * c * cr -
+        6.1 * (cr ** 2) +
+        7.6 * mn +
+        10 * mo -
+        6.8 * cr * mo -
+        6.9 * ni +
+        3.7 * c * ni -
+        2.7 * cr * ni +
+        0.8 * (ni ** 2) +
+        16.7 * si
+    )
+
+    return int(acm_value)
+
+
+def ae3c_calc(comp,T):
     return (((T*(9/5))+32)-1570+(25*comp['Mn'])-(80*comp['Si'])+(3*comp['Cr'])+(32*comp['Ni']))/(-323)
 
 def densityf(T,comp,sf):
@@ -25,7 +109,7 @@ def densitya(T,comp):
     return 8099.79 - (0.5060*T)+((-118.26+(0.00739*T))*(comp['C'])) - (68.24*comp['Si']) - (6.01*comp['Mn'])
 
 def maxf(comp,T,sf):
-    Wf = (Ae3C_Calc(comp,T) - comp['C'])/(Ae3C_Calc(comp,T) - sf)
+    Wf = (ae3c_calc(comp,T) - comp['C'])/(ae3c_calc(comp,T) - sf)
     return (Wf/densityf(T,comp,sf))/( (Wf/densityf(T,comp,sf)) + ((1-Wf)/densitya(T,comp)) )
 
 def Gl(l):
@@ -79,11 +163,11 @@ def DC_Lee(C,comp,T):
 def t_diff(comp,T):
     w = 0.2*10**(-6)
     Dc = []
-    XS = np.linspace(comp['C'],Ae3C_Calc(comp,T),20)
+    XS = np.linspace(comp['C'],ae3c_calc(comp,T),20)
     for x in XS:
-        Dc.append(DC_Lee(x,comp,T)/(Ae3C_Calc(comp,T)-comp['C']))
+        Dc.append(DC_Lee(x,comp,T)/(ae3c_calc(comp,T)-comp['C']))
     D = integrate.trapz(Dc,XS)
-    return ((w**2)*math.pi*(comp['C']-0.03)**2)/(16*D*((Ae3C_Calc(comp,T)-comp['C'])**2))
+    return ((w**2)*math.pi*(comp['C']-0.03)**2)/(16*D*((ae3c_calc(comp,T)-comp['C'])**2))
 
 def SX_eq(x):
     return (1/(x**(0.4*(1-x))*(1-x)**(0.4*x)))
@@ -107,7 +191,7 @@ def Steel_CCT_Calculator(comp,G,rates):
     for X in np.linspace(0.01,0.99,99):
         SX[round(X,2)] = quad(SX_eq, 0, round(X,2))[0]
 
-    Ae3i, Ae1i, PC = Ae3_Calc(comp), Ae1_Calc(comp), PC_Calc(comp)
+    Ae3i, Ae1i, PC = ae3_calc(comp), ae1_calc(comp), PC_Calc(comp)
     Ts, dT, Tfinish = {}, 1, 0
 
     for r in rates:
@@ -130,12 +214,12 @@ def Steel_CCT_Calculator(comp,G,rates):
             temp = np.linspace(Ae3i,0,(Ae3i+1)*int(dT**(-1)))
 
             if Xf == 0.01:
-                Ae3, FC = Ae3_Calc(compi), FC_Calc(compi)
+                Ae3, FC = ae3_calc(compi), FC_Calc(compi)
             if Xb == 0.01:
                 Bs, BC = Bs_Calc(compi), BC_Calc(compi)
             Ms = Ms_Calc(compi)
             To = T0_Calc(compi)
-            Acm = Acm_Calc(compi)
+            Acm = acm_calc(compi)
 
             rf, rp, rb = [], [], []
 
@@ -168,7 +252,7 @@ def Steel_CCT_Calculator(comp,G,rates):
                     tP = (PC/((2**(0.32*G)*((Ae1i-T)**3)*np.exp(-27500/(1.987*(T+273.15))))))*SX[round(Xp,2)]
                     rp.append(dt/tP)
 
-                    if sum(rp) >= 1.00 and T <= latest_trans and T <= min(Acm,Ae3_Calc(compi)):
+                    if sum(rp) >= 1.00 and T <= latest_trans and T <= min(Acm,ae3_calc(compi)):
 
                         Ts[r]['p'].append(round(T,1))
                         latest_trans = T
